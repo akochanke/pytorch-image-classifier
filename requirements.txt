@@ -1,0 +1,7 @@
+# used packages
+
+pip==20.3.3
+ipython==7.19.0
+pillow==8.0.1
+numpy==1.19.4
+torch==1.7.1
