@@ -1,5 +1,9 @@
 '''
-Program to carry out data preparation tasks
+Program to carry out data preparation tasks:
+
+- creates folder structure
+- images are shuffled
+- images can be resized
 
 '''
 
@@ -25,18 +29,19 @@ LOGGER.level = logging.INFO
 
 # parameters
 SPLIT = {'training': 0.8, 'validation': 0.1, 'test': 0.1}
-SEED = 42
+SEED = 42 # for reproducability
 random.seed(SEED)
 
 
-# function
-def resize_image(input_path, output_path, resolution):
+# functions
+def resize_image(input_path, output_path, resolution, file_extension='PNG'):
     '''Function to resize single image
 
     Parameters:
-        input_path (str): location of image
+        input_path (str): location of single image
         output_path (str): output location of image
         resolution (int): output resolution of image
+        file_extension (str): file type for pillow
 
     '''
 
@@ -44,14 +49,17 @@ def resize_image(input_path, output_path, resolution):
     img = Image.open(input_path)
     if resolution:
         img = img.resize((resolution, resolution))
-    img.save(output_path, 'PNG')
+    img.save(output_path, file_extension)
 
-def io_list(input_path, output_path, resolution):
-    '''Function to prepare an input/output list
+def io_list(input_path, output_path, resolution, file_extension='.png'):
+    '''Function to prepare an input/output list. This list can easily be parsed
+    to multiprocessing.
 
     Parameters:
         input_path (str): location of images
         output_path (str): location of images after transformation
+        resolution (int): resolution of transformed image (squared)
+        file_extension (str): new file extension
 
     Return:
         job_list (list): each element is a tuple (input, output, resolution)
@@ -71,7 +79,7 @@ def io_list(input_path, output_path, resolution):
     for cls in classes:
         image_list = os.listdir(os.path.join(input_path, cls))
         for img, spl in zip(image_list, data_splitting): # default value?
-            new_img = os.path.splitext(img)[0] + '.png'
+            new_img = os.path.splitext(img)[0] + file_extension
             job_list.append(
                 (os.path.join(input_path, cls, img),
                  os.path.join(output_path, spl, cls, new_img),

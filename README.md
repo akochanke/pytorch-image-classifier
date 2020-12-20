@@ -20,16 +20,16 @@
 
 ```bash
 data
-├── challenge_256
-│   ├── test
-│   |   ├── class1
-│   |   ├── class2
-│   |   ├── class3
-│   |   └── class4
-│   ├── training
-|   |   ├── ...
-│   └── validation
-|   |   ├── ...
+└── challenge_256
+    ├── test
+    |   ├── class1
+    |   ├── class2
+    |   ├── class3
+    |   └── class4
+    ├── training
+    |   └── ...
+    └── validation
+        └── ...
 ```
 
 ## Local results

@@ -1,6 +1,11 @@
-# starting train job
+# script to start a training job
+
+INPUT=data/challenge_256
+MODEL_TYPE=resnet18
+EXPORT=artifacts
+
 python -m trainer.task \
     --job training \
-    --input data/challenge_256 \
-    --export artifacts \
-    --model_type resnet18
+    --input ${INPUT} \
+    --model_type ${MODEL_TYPE}
+    --export ${EXPORT} \
