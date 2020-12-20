@@ -119,7 +119,7 @@ def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
                 with torch.set_grad_enabled(phase == 'training'):
                     outputs = model(inputs)
                     _, preds = torch.max(outputs, 1)
-                    print(outputs, labels)
+                    #print(outputs, labels)
                     loss = criterion(outputs, labels)
 
                     # backward + optimize only if in training phase

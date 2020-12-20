@@ -10,9 +10,36 @@
 ## Preprocessing
 
 - Initially create dataset with reduced resolution to develop pipeline
+- Resolution set to `256x256`
+
+## Usage
+
+- Use the `job_*.sh` scripts to commence training or evaluation
+- Tasks are managed via `task.py`
+- Assumed folder structure:
+
+```bash
+data
+├── challenge_256
+│   ├── test
+│   |   ├── class1
+│   |   ├── class2
+│   |   ├── class3
+│   |   └── class4
+│   ├── training
+|   |   ├── ...
+│   └── validation
+|   |   ├── ...
+```
+
+## Local results
+
+- SimpleCNN: accuracy of ~0.6 on test set
+- Restnet18: accuracy of ~0.85 on test set
 
 ## Cloud
 
+- Test with AutoML
 - `.tif` not supported currently
 - Trying `.png`
 - Current upload limit size at 30MB per file
@@ -21,12 +48,13 @@
 
 ## TODOs
 
-- Load model and predict
 - Opt: checkpoints
+- Early stopping
 
 ## Next steps
 
 - Better fitting metrics; probably recall
 - Systematic hyperparameter tuning
+- Crossvalidation for to better estimate generalizability
 - Other pretrained architectures
 - Eventually NAS
