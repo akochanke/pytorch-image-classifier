@@ -14,7 +14,8 @@
 
 ## Usage
 
-- Use the `job_*.sh` scripts to commence training or evaluation
+- Use the `job_*.sh` scripts to commence data preparation, training,
+  evaluation or crossvalidation
 - Tasks are managed via `task.py`
 - Assumed folder structure:
 
@@ -31,6 +32,9 @@ data
     └── validation
         └── ...
 ```
+
+- Subfolders `training`, `validation` and `test` are not applicable in case of
+  crossvalidation
 
 ## Local results
 
@@ -50,12 +54,11 @@ data
 
 ## Next steps
 
-- Checkpoints
+- Checkpoints (pick specific epoch)
 - Early stopping
 - Augmentation: affine transformations
 - Artifact management, e.g. MLflow
 - Better fitting metrics; probably recall
 - Systematic hyperparameter tuning
-- Crossvalidation for model training
 - Other pretrained architectures
 - Eventually NAS
