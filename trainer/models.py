@@ -76,8 +76,8 @@ class SimpleCNN(nn.Module):
         return num_features
 
 # functions
-def init_model(model_type='simplecnn', output_folder='artifacts',
-               timestamp='xxx'):
+def init_model(model_type='simplecnn', output_folder='',
+               timestamp=''):
     '''Function to initiate model object and save architecture
 
     Parameters:
@@ -105,7 +105,8 @@ def init_model(model_type='simplecnn', output_folder='artifacts',
     else:
         raise NotImplementedError
 
-    save_architecture(model_type, model, output_folder, timestamp)
+    if output_folder:
+        save_architecture(model_type, model, output_folder, timestamp)
 
     return model
 

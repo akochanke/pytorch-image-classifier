@@ -34,8 +34,10 @@ data
 
 ## Local results
 
-- SimpleCNN: accuracy of ~0.6 on test set
-- Restnet18: accuracy of ~0.85 on test set
+- SimpleCNN: accuracy of ~0.50 on test set (`training_20201221201500`)
+- CV: 0.50+=0.07 (10 fold)
+- Restnet18: accuracy of ~0.80 on test set (`training_20201221204908`)
+- CV: 0.78+=0.07 (10 fold)
 
 ## Cloud
 
@@ -46,15 +48,13 @@ data
 - Rescaling to `256x256` yields 0.77, 0.74, 0.73 (acc, prec, rec)
 - Original size yields 0.88, 0.84, 0.78 (acc, prec, rec)
 
-## TODOs
-
-- Opt: checkpoints
-- Early stopping
-
 ## Next steps
 
+- Checkpoints
+- Early stopping
+- Augmentation: affine transformations
 - Better fitting metrics; probably recall
 - Systematic hyperparameter tuning
-- Crossvalidation for to better estimate generalizability
+- Crossvalidation for model training
 - Other pretrained architectures
 - Eventually NAS

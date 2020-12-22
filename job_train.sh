@@ -7,5 +7,5 @@ EXPORT=artifacts
 python -m trainer.task \
     --job training \
     --input ${INPUT} \
-    --model_type ${MODEL_TYPE}
+    --model_type ${MODEL_TYPE} \
     --export ${EXPORT} \

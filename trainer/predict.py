@@ -60,3 +60,5 @@ def evaluate_model(dataloaders, dataset_sizes, model):
     LOGGER.info('Test complete in {:.0f}m {:.0f}s'.format(
         time_elapsed // 60, time_elapsed % 60))
     LOGGER.info('Average accuracy: {:4f}'.format(test_acc))
+
+    return test_acc

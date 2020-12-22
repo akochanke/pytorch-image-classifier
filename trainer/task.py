@@ -11,9 +11,11 @@ import argparse
 import logging
 
 # 3rd party
+import numpy as np
 
 # module imports
-from trainer.preprocess import (load_data, load_test)
+from trainer.preprocess import (load_data, load_test, get_images, cv_gen,
+                                load_data_cv)
 from trainer.training import (train_model, set_criterion, set_optimizer,
                               set_scheduler)
 from trainer.predict import evaluate_model
@@ -72,6 +74,44 @@ def apply_model(input_folder, model_path):
     # apply model to test set
     evaluate_model(dataloaders, dataset_sizes, model)
 
+def crossvalidation(input_folder, model_type):
+    '''Function to run a crossvalidation on the full dataset
+
+    Parameters:
+        input_folder (str): location of dataset
+        model_type (str): set used model type
+
+    '''
+
+    df = get_images(input_folder)
+
+    accuracies = []
+    run = 0
+
+    LOGGER.info('\n\n')
+    for data_dict in cv_gen(df):
+        run += 1
+        LOGGER.info('Crossvalidation run {}'.format(run))
+
+        dataloaders, class_names, dataset_sizes = load_data_cv(data_dict)
+
+        model = init_model(model_type=model_type)
+
+        criterion = set_criterion()
+        optimizer = set_optimizer(model)
+        scheduler = set_scheduler(optimizer)
+
+        model, _ = train_model(dataloaders, dataset_sizes, model, criterion,
+                               optimizer, scheduler, num_epochs=25)
+        
+        run_acc = evaluate_model(dataloaders, dataset_sizes, model)
+        accuracies.append(round(float(run_acc), 2))
+
+        LOGGER.info('Finished CV run. Accuracies: {}\n\n'.format(accuracies))
+
+    LOGGER.info('Average accuracy: {:.2f}+={:.2f}\nAll values: {}'.format(
+        np.mean(accuracies), np.std(accuracies), accuracies))
+
 
 def main(job, input_folder='', export_folder='', model_type= '',
          model_path=''):
@@ -91,6 +131,8 @@ def main(job, input_folder='', export_folder='', model_type= '',
         train(input_folder, export_folder, model_type, timestamp)
     elif job == 'evaluation':
         apply_model(input_folder, model_path)
+    elif job =='crossvalidation':
+        crossvalidation(input_folder, model_type)
     else:
         LOGGER.error('Job type {} not recognized!'.format(job))
         raise NotImplementedError
@@ -98,16 +140,16 @@ def main(job, input_folder='', export_folder='', model_type= '',
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', help='Folder with data. Expects train/val.',
-                        default='data/challenge_256')
+    parser.add_argument('--input', help='Folder with data.',
+                        default='')
     parser.add_argument('--export', help='Store model exports.',
-                        default='artifacts')
+                        default='')
     parser.add_argument('--model', help='Model location for interence.',
                         default='')
     parser.add_argument('--job', help='Set to train or eval.',
                         default='train')
     parser.add_argument('--model_type', help='Set type of model to train.',
-                        default='resnet18')
+                        default='simplecnn')
     args = parser.parse_args()
 
     INPUT = args.input
