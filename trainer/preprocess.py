@@ -1,5 +1,5 @@
 '''
-Module part to collect image preprocessing steps
+Module to define input pipelines
 
 '''
 
@@ -54,6 +54,9 @@ TEST = EVALUATION
 
 # classes
 class DatasetFromPath(Dataset):
+    '''Custom dataset class to work with a list of image paths/labels.
+    '''
+
     def __init__(self, data_tuple, transform):
         self.image_list = data_tuple[0]
         self.labels = data_tuple[1]
@@ -65,7 +68,7 @@ class DatasetFromPath(Dataset):
 
     def __getitem__(self, idx):
         img_loc = self.image_list[idx]
-        img_label = int(self.labels[idx][-1]) - 1
+        img_label = int(self.labels[idx][-1]) - 1 # class1 -> 0
         image = Image.open(img_loc)
         tensor_image = self.transform(image)
         return tensor_image, img_label
@@ -118,7 +121,7 @@ def load_data(input_folder, batch_size=4):
     return dataloaders, class_names, dataset_sizes
 
 def load_test(input_folder, batch_size=4):
-    '''Function to load test set.
+    '''Function to create dataloader for test set.
 
     Parameters:
         input_folder (str): data location; note that train/val is expected
@@ -161,11 +164,12 @@ def load_test(input_folder, batch_size=4):
     return dataloaders, class_names, dataset_sizes
 
 def imshow(inp, title=None):
-    '''Plot image for inspection. Note the normalization due to input
+    '''Plot image for inspection. Note the rev normalization due to input
     transformations.
-    
+
     Parameters:
-        inp ():
+        inp (torchvision.utils.make_grid()): image sample
+        title (str): default title
 
     '''
 
@@ -184,7 +188,7 @@ def vis_from_dataloaders(dataloaders, class_names):
 
     Parameters:
         dataloaders (dict): dictionary with dataloader instances
-        class_names (list): list of class names
+        class_names (list): list of class names for captions
 
     '''
 
@@ -194,16 +198,17 @@ def vis_from_dataloaders(dataloaders, class_names):
     # Make a grid from batch
     out = torchvision.utils.make_grid(inputs)
 
+    # visualize some images from dataloader instance
     imshow(out, title=[class_names[x] for x in classes])
 
 def get_images(input_folder):
-    '''Function to collect all image paths and labels
+    '''Function to collect all image paths and labels in dataframe.
 
     Parameters:
         input_folder (str): path to images
 
     Return:
-        df (pd.DataFrame): table of image data
+        df (pd.DataFrame): table of image data/labels
 
     '''
 
@@ -231,12 +236,16 @@ def cv_gen(df_data):
         df_data (pd.DataFrame): table with images and labels
 
     Return:
+        data_dict (dict): containing image/label lists for train/eval/test
 
     '''
 
     data_dict = {}
 
+    # stratified kfold to preserve class percentages
     skf = StratifiedKFold(n_splits=10, shuffle=True, random_state=42)
+
+    # split fold again into train/eval/test
     for train, test in skf.split(df_data['image_path'], df_data['label']):
         X, y = df_data['image_path'][train], df_data['label'][train]
         X_train, X_val, y_train, y_val = train_test_split(
@@ -251,6 +260,18 @@ def cv_gen(df_data):
 
 def load_data_cv(image_dict, batch_size=4):
     '''Function to create dataloaders from cv generator
+
+    Parameters:
+        image_dict (dict): contains image/label lists for train/eval/test
+        batch_size (int): size of batches
+
+    Return:
+        dataloaders (dict): contains Dataloader objects for training,
+        validation and test
+        class_names (list): list of class names
+        dataset_size (dict): amount of images in 'training', 'evaluation' and
+        'test'
+
     '''
 
     # define augmentation and preprocessing; images seem to be scaled to (0, 1)
@@ -260,6 +281,7 @@ def load_data_cv(image_dict, batch_size=4):
         'test': TEST
     }
 
+    # dataset object from custom class
     image_datasets = {x: DatasetFromPath(image_dict[x], data_transforms[x])
                       for x in ['training', 'validation', 'test']
                     }

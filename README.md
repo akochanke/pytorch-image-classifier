@@ -53,6 +53,7 @@ data
 - Checkpoints
 - Early stopping
 - Augmentation: affine transformations
+- Artifact management, e.g. MLflow
 - Better fitting metrics; probably recall
 - Systematic hyperparameter tuning
 - Crossvalidation for model training

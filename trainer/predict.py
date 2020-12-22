@@ -1,5 +1,5 @@
 '''
-Module to do a prediction job with a previously trained model
+Module to do inference with a previously trained model.
 
 '''
 
@@ -21,12 +21,12 @@ LOGGER.level = logging.INFO
 
 # functions
 def evaluate_model(dataloaders, dataset_sizes, model):
-    '''Function to apply model to data set
+    '''Function to apply model to data set.
 
     Parameters:
-        dataloaders (dict): contains the dataloader objects
+        dataloaders (dict): contains the dataloader object for 'test'
         dataset_sizes (dict): sizes of dataset; here 'test'
-        model (nn.Module): pytorch model instance
+        model (nn.Module): Pytorch model instance
 
     '''
 

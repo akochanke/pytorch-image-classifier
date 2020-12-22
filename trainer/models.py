@@ -1,13 +1,11 @@
 '''
-Module to collect used models
+Module to define model functionality
 
 '''
 
 # imports
 import os
-import shutil
 import logging
-import datetime
 
 # 3rd party
 import matplotlib.pyplot as plt
@@ -50,6 +48,9 @@ class SimpleCNN(nn.Module):
         self.fc3 = nn.Linear(in_features=128*16*16, out_features=4)
 
     def forward(self, x):
+        '''Define architecture in functional style.
+        '''
+
         # conv-net
         x = self.maxpool(F.relu(self.conv1(x)))
         x = self.maxpool(F.relu(self.conv2(x)))
@@ -65,7 +66,8 @@ class SimpleCNN(nn.Module):
 
         return output
 
-    def num_flat_features(self, x):
+    @staticmethod
+    def num_flat_features(x):
         '''Count dimensionality of layer
         '''
 
@@ -76,12 +78,12 @@ class SimpleCNN(nn.Module):
         return num_features
 
 # functions
-def init_model(model_type='simplecnn', output_folder='',
-               timestamp=''):
-    '''Function to initiate model object and save architecture
+def init_model(model_type='simplecnn', output_folder=''):
+    '''Function to initiate model object and save architecture to file.
 
     Parameters:
         model_type (str): define model type
+        output_folder (str): location of model architecture file
 
     Return:
         model (torch.model): model instance
@@ -90,6 +92,7 @@ def init_model(model_type='simplecnn', output_folder='',
 
     LOGGER.info('Initiating model type {}...'.format(model_type))
 
+    # choose model type
     if model_type == 'simplecnn':
         model = SimpleCNN()
     elif model_type == 'resnet18':
@@ -103,10 +106,12 @@ def init_model(model_type='simplecnn', output_folder='',
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, 4)
     else:
+        LOGGER.error('Unknown model type!')
         raise NotImplementedError
 
+    # safe model architecture to file
     if output_folder:
-        save_architecture(model_type, model, output_folder, timestamp)
+        save_architecture(model_type, model, output_folder)
 
     return model
 
@@ -133,7 +138,7 @@ def load_model(model_path):
 
     return model
 
-def save_architecture(model_type, model, export_folder, timestamp,
+def save_architecture(model_type, model, export_folder,
                       input_layer=(3, 256, 256)):
     '''Function to save model architecture in txt file.
 
@@ -141,19 +146,24 @@ def save_architecture(model_type, model, export_folder, timestamp,
         model_type (str): name of model type
         model (nn.Module): pytorch model instance
         export_folder (str): folder for file export
-        timestamp (str): for suffix creation
-        input_layer (tuple): input dimenions of model
+        input_layer (tuple): input dimenions of model for forward propagation
 
     '''
 
     summary_file = os.path.join(export_folder, model_type + '_summary.txt')
 
     model_summary = summary(model, input_layer)
+
     with open(summary_file, 'w') as f:
         f.write(str(model_summary))
 
 def vis_history(history, location):
     '''Function to visualize trianing history
+
+    Parameters:
+        history (dict): training history (loss/accuracy)
+        location (str): path to plot location
+
     '''
 
     plt.figure(figsize=(10, 10), dpi=150)
@@ -172,16 +182,19 @@ def vis_history(history, location):
     plt.close()
 
 def export_model(model, model_type, history, export_folder):
-    '''Function to export model artifacts
+    '''Function to export model artifacts.
 
     Parameters:
+        model (nn.Module): Pytorch model instance
+        model_type (str): name of model type
+        history (dict): training history (loss/accuracy)
         export_folder (str): where model files will be saved
 
     '''
 
-    # save model binary
+    # save model binary (weights + architecture)
     torch.save(model,
                os.path.join(export_folder, model_type + '.pth'))
 
-    # save train history
+    # save train history to plot
     vis_history(history, export_folder)

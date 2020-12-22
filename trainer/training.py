@@ -1,10 +1,9 @@
 '''
-Module part to control the trianing
+Module part to define model training
 
 '''
 
 # imports
-import os
 import time
 import copy
 import logging
@@ -24,28 +23,27 @@ LOGGER = logging.getLogger(__name__)
 LOGGER.level = logging.INFO
 
 
-# function
+# functions
 def set_criterion():
-    '''function to define criterion for training
+    '''Function to define criterion (loss) for training.
 
     Return:
-        instance of loss class CrossEntropyLoss
+        instance of Pytorch loss class: CrossEntropyLoss()
 
     '''
 
-    # return instance of loss class
     return nn.CrossEntropyLoss()
 
 def set_optimizer(model, optimizer='sdg'):
-    '''Function to define used optimizer during training.
+    '''Function to define optimizer during training.
     Supported: SDG, Adam
 
     Parameters:
-        model ():
+        model (nn.Module): Pytorch model instance
         optimizer (str): name of optimizer
 
     Return:
-        opt (optim.XXX): instance of optimizer class
+        opt (optim.<optimizer_class>): instance of optimizer class
 
     '''
 
@@ -55,14 +53,14 @@ def set_optimizer(model, optimizer='sdg'):
         opt = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     elif optimizer == 'adam':
         opt = optim.Adam(model.parameters(), lr=0.001)
-    
+
     return opt
 
 def set_scheduler(optimizer):
-    '''Function to define the scheduler during training
+    '''Function to define learn rate scheduler during training.
 
     Return:
-        scheduler instance of class StepLR
+        scheduler (optim.<lr_scheduler_class>): learn reate scheduler instance
 
     '''
 
@@ -70,13 +68,20 @@ def set_scheduler(optimizer):
 
 def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
                 scheduler, num_epochs=25):
-    '''Function to train a model
+    '''Function to train a model.
 
     Parameters:
-        model
+        dataloaders (dict): contains dataloader instances
+        dataset_sizes (dict): sizes of dataset splits
+        model (nn.Module): Pytorch model object
+        criterion (nn.<loss_class>): Pytorch loss instance
+        optimizer (optim.<optimizer_class>): optimizer class instance
+        scheduler (optim.<lr_scheduler_class>): learn rate scheduler instance
+        num_epochs (int): amount of epochs
 
     Return:
-        model
+        model (nn.Module): trained model object
+        history (dict): collection of loss and accuracy values during training
 
     '''
 
@@ -92,21 +97,22 @@ def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
     history = {'training': {'loss': [], 'acc': []},
                'validation': {'loss': [], 'acc': []}}
 
+    # loop epochs
     for epoch in range(num_epochs):
         LOGGER.info('Epoch {}/{}'.format(epoch, num_epochs - 1))
         LOGGER.info('-' * 10)
 
-        # Each epoch has a training and validation phase
+        # each epoch has a training and validation phase
         for phase in ['training', 'validation']:
             if phase == 'training':
-                model.train()  # Set model to training mode
+                model.train() # set model to training mode
             else:
-                model.eval()   # Set model to evaluate mode
+                model.eval() # set model to evaluate mode (dropout/batchnorm)
 
             running_loss = 0.0
             running_corrects = 0
 
-            # Iterate over data.
+            # iterate over data.
             for inputs, labels in dataloaders[phase]:
                 inputs = inputs.to(device)
                 labels = labels.to(device)
@@ -114,12 +120,10 @@ def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
                 # zero the parameter gradients
                 optimizer.zero_grad()
 
-                # forward
-                # track history if only in train
+                # compute inference and gradients
                 with torch.set_grad_enabled(phase == 'training'):
                     outputs = model(inputs)
                     _, preds = torch.max(outputs, 1)
-                    #print(outputs, labels)
                     loss = criterion(outputs, labels)
 
                     # backward + optimize only if in training phase
@@ -127,12 +131,15 @@ def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
                         loss.backward()
                         optimizer.step()
 
-                # statistics
+                # aggregate loss and accuracy
                 running_loss += loss.item() * inputs.size(0)
                 running_corrects += torch.sum(preds == labels.data)
+
+            # update lr scheduler during training
             if phase == 'training':
                 scheduler.step()
 
+            # compute phase loss and accuracy
             epoch_loss = running_loss / dataset_sizes[phase]
             epoch_acc = running_corrects.double() / dataset_sizes[phase]
 
