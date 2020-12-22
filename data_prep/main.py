@@ -97,6 +97,7 @@ def io_list(input_path, output_path, resolution, split, file_extension='.png'):
 
     classes = os.listdir(input_path)
 
+    # randomly assign examples to train/eval/test
     data_splitting = shuffle_split()
 
     for cls in classes:
@@ -106,7 +107,7 @@ def io_list(input_path, output_path, resolution, split, file_extension='.png'):
             LOGGER.warning(
                 'Amount of images and dataset splitting does not match!')
 
-        for img, spl in zip_longest(image_list, data_splitting, 
+        for img, spl in zip_longest(image_list, data_splitting,
                                     fillvalue='training'):
             new_img = os.path.splitext(img)[0] + file_extension
             origin = os.path.join(input_path, cls, img)
@@ -123,7 +124,7 @@ def io_list(input_path, output_path, resolution, split, file_extension='.png'):
     return job_list
 
 def prep_folder(input_folder, output_folder, split):
-    '''Function to create new dataset folder; preserves structure
+    '''Function to create new dataset folder; preserves class structure
 
     Parameters:
         input_folder (str): original dataset
@@ -153,22 +154,25 @@ def prep_folder(input_folder, output_folder, split):
             os.mkdir(os.path.join(output_folder, cls))
 
 def main(input_folder, output_folder, resolution, split):
-    '''Main function
+    '''Main function for data preparation.
 
     Parameters:
         input_folder (str): original dataset location
-        output_folder (str): dataset after transformation
+        output_folder (str): dataset location after transformation
         resolution (int): new image resolution (squared)
         split (bool): set to generate train/eval/test split
 
     '''
 
+    # create folder structure
     prep_folder(input_folder, output_folder, split)
 
+    # generate transformation queue
     queue = io_list(input_folder, output_folder, resolution, split)
 
+    # run queue via multiprocessing
     with Pool(4) as p:
-        p.starmap(resize_image, queue)
+        p.starmap(resize_image, queue) # starmap to unwrap argument
 
 
 if __name__ == '__main__':
