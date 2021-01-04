@@ -1,3 +1,6 @@
+# vscode
+.vscode
+
 # python
 .venv_pytorch_image_classifier
 **/__pycache__
