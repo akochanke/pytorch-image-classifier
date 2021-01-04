@@ -2,7 +2,7 @@
 Pytorch module to create image classifier. Supported tasks:
 
 - training
-- model application
+- model inference
 - crossvalidation
 
 '''
@@ -56,8 +56,7 @@ def train(input_folder, export_folder, model_type, timestamp):
     dataloaders, _, dataset_sizes = load_data(input_folder)
 
     # initiate model instance
-    model = init_model(model_type=model_type, output_folder=model_folder,
-                       timestamp=timestamp)
+    model = init_model(model_type=model_type, output_folder=model_folder)
 
     # further training objects
     criterion = set_criterion()
@@ -169,15 +168,17 @@ if __name__ == '__main__':
 
     # argument parsing
     parser = argparse.ArgumentParser()
-    parser.add_argument('--input', help='Folder with data for train/eval.',
+    parser.add_argument('--input', help='Set folder for image data.',
                         default='')
-    parser.add_argument('--export', help='Store model exports.',
+    parser.add_argument('--export', help='Set folder for artifact exports.',
                         default='')
     parser.add_argument('--model', help='Model location for inference.',
                         default='')
-    parser.add_argument('--job', help='Set to train or eval.',
+    parser.add_argument('--job',
+                        help='Set to training, evaluation or crossvalidation.',
                         default='train')
-    parser.add_argument('--model_type', help='Set type of model to train.',
+    parser.add_argument('--model_type',
+                        help='Set type of model (simplecnn/resnet18).',
                         default='simplecnn')
     args = parser.parse_args()
 
@@ -187,7 +188,7 @@ if __name__ == '__main__':
     JOB = args.job
     MODEL_TYPE = args.model_type
 
-    LOGGER.info('Arguments: {}'.format(args))
+    LOGGER.info('Parsed arguments: {}'.format(args))
 
     # run module
     main(JOB, INPUT, EXPORT, MODEL_TYPE, MODEL)

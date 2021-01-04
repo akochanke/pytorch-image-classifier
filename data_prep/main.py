@@ -124,7 +124,8 @@ def io_list(input_path, output_path, resolution, split, file_extension='.png'):
     return job_list
 
 def prep_folder(input_folder, output_folder, split):
-    '''Function to create new dataset folder; preserves class structure
+    '''Function to create new dataset folder; preserves class structure;
+    already existing folders are overwritten.
 
     Parameters:
         input_folder (str): original dataset
@@ -172,7 +173,7 @@ def main(input_folder, output_folder, resolution, split):
 
     # run queue via multiprocessing
     with Pool(4) as p:
-        p.starmap(resize_image, queue) # starmap to unwrap argument
+        p.starmap(resize_image, queue) # starmap to unwrap queue
 
 
 if __name__ == '__main__':

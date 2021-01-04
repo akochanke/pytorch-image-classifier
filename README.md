@@ -3,21 +3,26 @@
 ## Task
 
 - Build an image classifier for the 4 tissue types
-- 100 images per class; equally distributed -> acc is ok
-- `.tif` file format with a resolution of `(2048x1536)`
-- Based on PyTorch
+- 100 images per class; equally distributed -> acc values have more meaning
+- `.tif` file format with a resolution of `(2048x1536)`; 18MB per image
+- Framework: PyTorch
 
 ## Preprocessing
 
-- Initially create dataset with reduced resolution to develop pipeline
-- Resolution set to `256x256`
+- Initially create dataset with reduced resolution to develop pipeline and
+faster feedback loop
+- Image handling via Pillow
+- Data split `0.8/0.1/0.1` for `test/eval/test`; images are shuffled
+- Split can be disabled for crossvalidation
+- Resolution set to `256x256`; default filter `BICUBIC`; file format `*.png`
+- A job list is created and processed via `multiprocessing`
 
 ## Usage
 
 - Use the `job_*.sh` scripts to commence data preparation, training,
   evaluation or crossvalidation
 - Tasks are managed via `task.py`
-- Assumed folder structure:
+- Assumed folder structure for datasets:
 
 ```bash
 data
@@ -38,7 +43,7 @@ data
 
 ## Local results
 
-- SimpleCNN: accuracy of ~0.50 on test set (`training_20201221201500`)
+- SimpleCNN: accuracy of ~0.48 on test set (`training_20201221201500`)
 - CV: 0.50+=0.07 (10 fold)
 - Restnet18: accuracy of ~0.80 on test set (`training_20201221204908`)
 - CV: 0.78+=0.07 (10 fold)
@@ -56,9 +61,17 @@ data
 
 - Checkpoints (pick specific epoch)
 - Early stopping
-- Augmentation: affine transformations
-- Artifact management, e.g. MLflow
-- Better fitting metrics; probably recall
-- Systematic hyperparameter tuning
-- Other pretrained architectures
-- Eventually NAS
+- Both can be helpful to avoid overfitting
+- Expand methods of augmentation:
+  - Affine transformations
+  - Cropping
+  - Other noise forms
+  - The paper also suggests occlusions
+  - Maybe other tools for augmentation, e.g. Albumentations, Imgaug
+- Artifact management, e.g. MLflow, Kubeflow, Allegro Trains(?)
+- Better fitting metrics, e.g. Recall or F1
+- Systematic hyperparameter tuning, e.g. Optuna, Hyperopt
+- Other pretrained architectures (transfer learning)
+- Potentially try ensemble methods or Neural Architecture Search
+  - [Freiburg Group](https://www.automl.org/)
+  - [Survey2020](https://arxiv.org/pdf/2006.02903.pdf)
