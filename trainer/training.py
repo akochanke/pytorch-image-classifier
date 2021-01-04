@@ -56,15 +56,19 @@ def set_optimizer(model, optimizer='sdg'):
 
     return opt
 
-def set_scheduler(optimizer):
-    '''Function to define learn rate scheduler during training.
+def set_scheduler(optimizer, step_size=9, gamma=0.1):
+    '''Function to define learn rate scheduler during training. Default values:
+    step_size=7, gamma=0.1; learning rate decays by gamma every step_size
 
     Return:
         scheduler (optim.<lr_scheduler_class>): learn reate scheduler instance
 
     '''
 
-    return lr_scheduler.StepLR(optimizer, step_size=7, gamma=0.1)
+    LOGGER.info('StepLR parameters: step_size={}, gamma={}'.format(
+        step_size, gamma))
+
+    return lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma)
 
 def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
                 scheduler, num_epochs=25):

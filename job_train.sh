@@ -1,8 +1,8 @@
 # script to start a training job
 
 INPUT=data/challenge_256
-#MODEL_TYPE=resnet18
-MODEL_TYPE=simplecnn
+MODEL_TYPE=resnet18
+#MODEL_TYPE=simplecnn
 EXPORT=artifacts
 
 python -m trainer.task \
