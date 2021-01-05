@@ -1,5 +1,5 @@
 '''
-Module to define model functionality
+Module to define model classes and model functionality.
 
 '''
 
@@ -26,7 +26,7 @@ LOGGER.level = logging.INFO
 
 # classes
 class SimpleCNN(nn.Module):
-    '''Simple model class based von conv2d layers and a fully connected head
+    '''Simple model class based von conv2d layers and a fully connected head.
     '''
 
     def __init__(self):
@@ -41,10 +41,10 @@ class SimpleCNN(nn.Module):
                                kernel_size=5, stride=1, padding=2)
         self.conv4 = nn.Conv2d(in_channels=64, out_channels=128,
                                kernel_size=5, stride=1, padding=2)
-        self.conv5 = nn.Conv2d(in_channels=128, out_channels=256,
-                               kernel_size=5, stride=1, padding=2)
-        self.fc1 = nn.Linear(in_features=128*16*16, out_features=64)
-        self.fc2 = nn.Linear(in_features=128*16*16, out_features=64)
+        #self.conv5 = nn.Conv2d(in_channels=128, out_channels=256,
+        #                       kernel_size=5, stride=1, padding=2)
+        #self.fc1 = nn.Linear(in_features=128*16*16, out_features=64)
+        #self.fc2 = nn.Linear(in_features=128*16*16, out_features=64)
         self.fc3 = nn.Linear(in_features=128*16*16, out_features=4)
 
     def forward(self, x):
@@ -68,7 +68,7 @@ class SimpleCNN(nn.Module):
 
     @staticmethod
     def num_flat_features(x):
-        '''Count dimensionality of layer
+        '''Count dimensionality of layer.
         '''
 
         size = x.size()[1:] # all dims without batch
@@ -95,6 +95,7 @@ def init_model(model_type='simplecnn', output_folder=''):
     # choose model type
     if model_type == 'simplecnn':
         model = SimpleCNN()
+
     elif model_type == 'resnet18':
         model = models.resnet18(pretrained=True)
 
@@ -105,8 +106,9 @@ def init_model(model_type='simplecnn', output_folder=''):
 
         num_ftrs = model.fc.in_features
         model.fc = nn.Linear(num_ftrs, 4)
+
     else:
-        LOGGER.error('Unknown model type!')
+        LOGGER.error('Unknown model type {}!'.format(model_type))
         raise NotImplementedError
 
     # safe model architecture to file
@@ -116,8 +118,8 @@ def init_model(model_type='simplecnn', output_folder=''):
     return model
 
 def load_model(model_path):
-    '''Function to load previously trained model from *.pth. Note that file
-    with full model export is expected.
+    '''Function to load previously trained model from `*.pth`. Note that file
+    with full model export is expected, i.e. via `torch.save()`.
 
     Parameters:
         model_folder (str): folder with model file
@@ -140,7 +142,7 @@ def load_model(model_path):
 
 def save_architecture(model_type, model, export_folder,
                       input_layer=(3, 256, 256)):
-    '''Function to save model architecture in txt file.
+    '''Function to save model architecture to txt file.
 
     Parameters:
         model_type (str): name of model type
@@ -155,7 +157,7 @@ def save_architecture(model_type, model, export_folder,
     model_summary = summary(model, input_layer)
 
     with open(summary_file, 'w') as f:
-        f.write(str(model_summary))
+        f.write(str(model_summary)) # type of model_summary is ModelStatistics
 
 def vis_history(history, location):
     '''Function to visualize trianing history

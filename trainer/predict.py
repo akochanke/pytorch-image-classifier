@@ -28,6 +28,9 @@ def evaluate_model(dataloaders, dataset_sizes, model):
         dataset_sizes (dict): sizes of dataset; here 'test'
         model (nn.Module): Pytorch model instance
 
+    Return:
+        test_acc (float): result from test set inference
+
     '''
 
     # choose hardware
@@ -54,7 +57,7 @@ def evaluate_model(dataloaders, dataset_sizes, model):
         running_corrects += torch.sum(preds == labels.data)
 
     # average accuracy
-    test_acc = running_corrects.double() / dataset_sizes['test']
+    test_acc = float(running_corrects / dataset_sizes['test'])
 
     time_elapsed = time.time() - since
     LOGGER.info('Test complete in {:.0f}m {:.0f}s'.format(

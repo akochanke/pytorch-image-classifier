@@ -43,6 +43,7 @@ def train(input_folder, export_folder, model_type, timestamp):
         export_folder (str): location for artifact export
         model_type (str): define model architecture
         timestamp (str): job id
+
     '''
 
     # create output folder
@@ -71,7 +72,8 @@ def train(input_folder, export_folder, model_type, timestamp):
     export_model(model, model_type, history, model_folder)
 
 def apply_model(input_folder, model_path):
-    '''Function to apply previously trained model to dataset.
+    '''Function to apply previously trained model to dataset. Input folder
+    is assumed to have a 'test' folder.
 
     Parameters:
         input_folder (str): location of dataset; expects `test` subfolder
@@ -89,7 +91,9 @@ def apply_model(input_folder, model_path):
     evaluate_model(dataloaders, dataset_sizes, model)
 
 def crossvalidation(input_folder, model_type):
-    '''Function to run a crossvalidation on the full dataset
+    '''Function to run a crossvalidation on the full dataset. Input folder
+    needs to contain the images without train/val/test split. The splits are
+    computed on the fly in `cv_gen`.
 
     Parameters:
         input_folder (str): location of dataset
@@ -100,11 +104,12 @@ def crossvalidation(input_folder, model_type):
     # collect all images in dataframe
     df = get_images(input_folder)
 
+    # cv parameters
     accuracies = []
     run = 0
 
-    # CV loop
-    print('\n\n')
+    # cv loop
+    print('\n')
     for data_dict in cv_gen(df):
         run += 1
         LOGGER.info('Crossvalidation run {}'.format(run))
@@ -128,15 +133,15 @@ def crossvalidation(input_folder, model_type):
         run_acc = evaluate_model(dataloaders, dataset_sizes, model)
 
         # collect accuracies during cv
-        accuracies.append(round(float(run_acc), 2))
+        accuracies.append(round(run_acc, 2))
 
         LOGGER.info('Finished CV run. Accuracies: {}'.format(accuracies))
-        print('\n\n')
+        print('\n')
 
     LOGGER.info('Average accuracy: {:.2f}+={:.2f}\nAll values: {}'.format(
         np.mean(accuracies), np.std(accuracies), accuracies))
 
-def main(job, input_folder='', export_folder='', model_type= '',
+def main(job, input_folder, export_folder='', model_type='',
          model_path=''):
     '''Main function to handle jobs.
 

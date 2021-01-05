@@ -68,6 +68,7 @@ data
   - Other noise forms
   - The paper also suggests occlusions
   - Maybe other tools for augmentation, e.g. Albumentations, Imgaug
+  - More image inspection
 - Artifact management, e.g. MLflow, Kubeflow, Allegro Trains(?)
 - Better fitting metrics, e.g. Recall or F1
 - Systematic hyperparameter tuning, e.g. Optuna, Hyperopt

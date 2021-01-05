@@ -53,10 +53,13 @@ def set_optimizer(model, optimizer='sdg'):
         opt = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     elif optimizer == 'adam':
         opt = optim.Adam(model.parameters(), lr=0.001)
+    else:
+        LOGGER.error('Optimizer {} not recognized!'.format(optimizer))
+        raise NotImplementedError
 
     return opt
 
-def set_scheduler(optimizer, step_size=9, gamma=0.1):
+def set_scheduler(optimizer, step_size=7, gamma=0.1):
     '''Function to define learn rate scheduler during training. Default values:
     step_size=7, gamma=0.1; learning rate decays by gamma every step_size
 
@@ -85,7 +88,7 @@ def train_model(dataloaders, dataset_sizes, model, criterion, optimizer,
 
     Return:
         model (nn.Module): trained model object
-        history (dict): collection of loss and accuracy values during training
+        history (dict): dictionary of loss and accuracy values during training
 
     '''
 

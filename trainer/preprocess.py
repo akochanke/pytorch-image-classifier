@@ -68,7 +68,7 @@ class DatasetFromPath(Dataset):
 
     def __getitem__(self, idx):
         img_loc = self.image_list[idx]
-        img_label = int(self.labels[idx][-1]) - 1 # class1 -> 0
+        img_label = int(self.labels[idx][-1]) - 1 # e.g class1 -> 0
         image = Image.open(img_loc)
         tensor_image = self.transform(image)
         return tensor_image, img_label
@@ -76,11 +76,11 @@ class DatasetFromPath(Dataset):
 
 # functions
 def load_data(input_folder, batch_size=4):
-    '''Function to initiate dataloaders for Pytorch
+    '''Function to initiate dataloaders for training.
 
     Parameters:
         input_folder (str): data location; note that train/val is expected
-        batch_size (int): size of image batch
+        batch_size (int): size of mini batch
 
     Return:
         dataloaders (dict): contains Dataloader objects for training and
@@ -202,10 +202,11 @@ def vis_from_dataloaders(dataloaders, class_names):
     imshow(out, title=[class_names[x] for x in classes])
 
 def get_images(input_folder):
-    '''Function to collect all image paths and labels in dataframe.
+    '''Function to collect all image paths within a folder and store these
+    together with their labels in a dataframe.
 
     Parameters:
-        input_folder (str): path to images
+        input_folder (str): path to image folder
 
     Return:
         df (pd.DataFrame): table of image data/labels
@@ -230,7 +231,7 @@ def get_images(input_folder):
     return df
 
 def cv_gen(df_data):
-    '''Function to create generator for crossvalidation
+    '''Function to create generator for crossvalidation.
 
     Parameters:
         df_data (pd.DataFrame): table with images and labels
